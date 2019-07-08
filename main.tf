@@ -24,6 +24,7 @@ resource "aws_subnet" "main" {
 resource "aws_security_group" "allow_incoming_http" {
   name        = "allow-incoming-demo"
   description = "Allow inbound HTTP traffic"
+  vpc_id      = "${aws_vpc.main.id}"
 }
 resource "aws_security_group_rule" "ingress-http" {
   type        = "ingress"
@@ -45,6 +46,7 @@ resource "aws_security_group_rule" "ingress-https" {
 resource "aws_security_group" "allow_incoming_ssh" {
   name        = "allow_incoming_ssh"
   description = "Allow inbound SSH traffic"
+  vpc_id      = "${aws_vpc.main.id}"
 }
 resource "aws_security_group_rule" "ingress-ssh" {
   type        = "ingress"

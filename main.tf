@@ -13,6 +13,7 @@ provider "aws" {
 
 resource "aws_vpc" "main" {
   cidr_block = "10.0.0.0/16"
+  enable_dns_hostnames = true
 }
 
 resource "aws_subnet" "main" {
@@ -62,6 +63,7 @@ resource "aws_key_pair" "ansible" {
 resource "aws_instance" "web" {
   ami           = "ami-0bb35a5dad5658286"
   instance_type = "t2.micro"
+  associate_public_ip_address = true
   subnet_id = "${aws_subnet.main.id}"
   vpc_security_group_ids = ["${aws_security_group.allow_incoming_ssh.id}","${aws_security_group.allow_incoming_http.id}"]
   key_name = "${aws_key_pair.ansible.key_name}"
@@ -74,6 +76,7 @@ resource "aws_instance" "web" {
 resource "aws_instance" "db" {
   ami           = "ami-0bb35a5dad5658286"
   instance_type = "t2.micro"
+  associate_public_ip_address = true
   subnet_id = "${aws_subnet.main.id}"
   vpc_security_group_ids = ["${aws_security_group.allow_incoming_ssh.id}"]
   key_name = "${aws_key_pair.ansible.key_name}"
@@ -86,6 +89,7 @@ resource "aws_instance" "db" {
 resource "aws_instance" "jenkins" {
   ami           = "ami-0bb35a5dad5658286"
   instance_type = "t2.micro"
+  associate_public_ip_address = true
   subnet_id = "${aws_subnet.main.id}"
   vpc_security_group_ids = ["${aws_security_group.allow_incoming_ssh.id}"]
   key_name = "${aws_key_pair.ansible.key_name}"

@@ -16,10 +16,29 @@ resource "aws_vpc" "main" {
   enable_dns_hostnames = true
 }
 
+resource "aws_internet_gateway" "gw" {
+  vpc_id = "${aws_vpc.main.id}"
+}
+
 resource "aws_subnet" "main" {
   vpc_id     = "${aws_vpc.main.id}"
   cidr_block = "10.0.1.0/24"
 }
+
+resource "aws_route_table" "route" {
+  vpc_id = "${aws_vpc.main.id}"
+
+  route {
+    cidr_block = "0.0.0.0/0"
+    gateway_id = "${aws_internet_gateway.gw.id}"
+  }
+}
+
+resource "aws_route_table_association" "route-association" {
+  subnet_id      = "${aws_subnet.main.id}"
+  route_table_id = "${aws_route_table.route.id}"
+}
+
 
 resource "aws_security_group" "allow_incoming_http" {
   name        = "allow-incoming-demo"
@@ -69,7 +88,7 @@ resource "aws_instance" "web" {
   subnet_id = "${aws_subnet.main.id}"
   vpc_security_group_ids = ["${aws_security_group.allow_incoming_ssh.id}","${aws_security_group.allow_incoming_http.id}"]
   key_name = "${aws_key_pair.ansible.key_name}"
-
+  depends_on = ["aws_internet_gateway.gw"]
   tags = {
     Name = "web"
   }
@@ -82,7 +101,7 @@ resource "aws_instance" "db" {
   subnet_id = "${aws_subnet.main.id}"
   vpc_security_group_ids = ["${aws_security_group.allow_incoming_ssh.id}"]
   key_name = "${aws_key_pair.ansible.key_name}"
-
+  depends_on = ["aws_internet_gateway.gw"]
   tags = {
     Name = "db"
   }
@@ -95,7 +114,7 @@ resource "aws_instance" "jenkins" {
   subnet_id = "${aws_subnet.main.id}"
   vpc_security_group_ids = ["${aws_security_group.allow_incoming_ssh.id}"]
   key_name = "${aws_key_pair.ansible.key_name}"
-
+  depends_on = ["aws_internet_gateway.gw"]
   tags = {
     Name = "jenkins"
   }

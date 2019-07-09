@@ -62,19 +62,26 @@ resource "aws_security_group" "allow_incoming_http" {
 }
 resource "aws_security_group_rule" "ingress-http" {
   type        = "ingress"
-  from_port   = 80
-  to_port     = 80
+  from_port   = 3000
+  to_port     = 3000
   protocol    = "tcp"
   cidr_blocks = ["0.0.0.0/0"]
   security_group_id = "${aws_security_group.allow_incoming_http.id}"
 }
-resource "aws_security_group_rule" "ingress-https" {
+
+resource "aws_security_group" "allow_incoming_mongodb" {
+  name        = "allow-incoming-mongodb"
+  description = "Allow inbound mongodb traffic"
+  vpc_id      = "${aws_vpc.main.id}"
+}
+resource "aws_security_group_rule" "ingress-mongodb" {
   type        = "ingress"
-  from_port   = 443
-  to_port     = 443
+  from_port   = 27017
+  to_port     = 27017
   protocol    = "tcp"
-  cidr_blocks = ["0.0.0.0/0"]
-  security_group_id = "${aws_security_group.allow_incoming_http.id}"
+  cidr_blocks = ["${aws_instance.web.private_ip}/32"]
+  security_group_id = "${aws_security_group.allow_incoming_mongodb.id}"
+  depends_on = ["aws_instance.web"]
 }
 
 resource "aws_security_group" "allow_incoming_ssh" {
@@ -123,7 +130,7 @@ resource "aws_instance" "db" {
   instance_type = "t2.micro"
   associate_public_ip_address = true
   subnet_id = "${aws_subnet.main.id}"
-  vpc_security_group_ids = ["${aws_security_group.allow_outgoing_any.id}","${aws_security_group.allow_incoming_ssh.id}"]
+  vpc_security_group_ids = ["${aws_security_group.allow_outgoing_any.id}","${aws_security_group.allow_incoming_mongodb.id}","${aws_security_group.allow_incoming_ssh.id}"]
   key_name = "${aws_key_pair.ansible.key_name}"
   depends_on = ["aws_internet_gateway.gw"]
   root_block_device {
@@ -145,7 +152,7 @@ resource "aws_instance" "jenkins" {
   instance_type = "t2.micro"
   associate_public_ip_address = true
   subnet_id = "${aws_subnet.main.id}"
-  vpc_security_group_ids = ["${aws_security_group.allow_outgoing_any.id}","${aws_security_group.allow_incoming_ssh.id}","${aws_security_group.allow_incoming_http.id}"]
+  vpc_security_group_ids = ["${aws_security_group.allow_outgoing_any.id}","${aws_security_group.allow_incoming_ssh.id}"]
   key_name = "${aws_key_pair.ansible.key_name}"
   depends_on = ["aws_internet_gateway.gw"]
   root_block_device {

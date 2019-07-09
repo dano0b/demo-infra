@@ -91,11 +91,11 @@ resource "aws_instance" "web" {
   depends_on = ["aws_internet_gateway.gw"]
   root_block_device {
     delete_on_termination = true
-    volume_size = 2
+    volume_size = 8
   }
   ebs_block_device {
     device_name = "/dev/sdg"
-    volume_size = 2
+    volume_size = 8
     delete_on_termination = true
   }
   tags = {
@@ -112,12 +112,12 @@ resource "aws_instance" "db" {
   key_name = "${aws_key_pair.ansible.key_name}"
   depends_on = ["aws_internet_gateway.gw"]
   root_block_device {
-    volume_size = 2
+    volume_size = 8
     delete_on_termination = true
   }
   ebs_block_device {
     device_name = "/dev/sdg"
-    volume_size = 2
+    volume_size = 8
     delete_on_termination = true
   }
   tags = {
@@ -134,12 +134,12 @@ resource "aws_instance" "jenkins" {
   key_name = "${aws_key_pair.ansible.key_name}"
   depends_on = ["aws_internet_gateway.gw"]
   root_block_device {
-    volume_size = 2
+    volume_size = 8
     delete_on_termination = true
   }
   ebs_block_device {
     device_name = "/dev/sdg"
-    volume_size = 2
+    volume_size = 8
     delete_on_termination = true
   }
   tags = {

@@ -1,4 +1,10 @@
 ---
-- name: do web stuff
-  debug:
-    msg: "do web stuff"
+- name: create the demo app container
+  docker_container:
+    name: demoapp
+    image: dano0b/demo:6
+    network_mode: host
+    restart_policy: unless-stopped
+    env:
+      PORT: "3000"
+      MONGODB_ADDON_URI: "mongodb://{{ hostvars['db']['ansible_eth0']['ipv4']['address'] }}:27017/test"

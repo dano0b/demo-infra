@@ -4,3 +4,6 @@
   roles:
     - dano0b.datadisk
     - dano0b.docker
+    - dano0b.demoapp
+    - dano0b.mongodb
+    - dano0b.jenkins

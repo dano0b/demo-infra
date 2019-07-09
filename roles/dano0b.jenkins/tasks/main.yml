@@ -1,0 +1,4 @@
+---
+- name: include tasks for host db
+  include: jenkins.yml
+  when: inventory_hostname == "jenkins"

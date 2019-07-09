@@ -1,0 +1,4 @@
+---
+- name: do db stuff
+  debug:
+    msg: "do db stuff"

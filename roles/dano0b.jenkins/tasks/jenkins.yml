@@ -1,0 +1,4 @@
+---
+- name: do jenkins stuff
+  debug:
+    msg: "do jenkins stuff"

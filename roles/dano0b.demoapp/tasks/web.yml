@@ -1,0 +1,4 @@
+---
+- name: do web stuff
+  debug:
+    msg: "do web stuff"

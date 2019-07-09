@@ -89,6 +89,15 @@ resource "aws_instance" "web" {
   vpc_security_group_ids = ["${aws_security_group.allow_incoming_ssh.id}","${aws_security_group.allow_incoming_http.id}"]
   key_name = "${aws_key_pair.ansible.key_name}"
   depends_on = ["aws_internet_gateway.gw"]
+  root_block_device {
+    delete_on_termination = true
+    volume_size = 2
+  }
+  ebs_block_device {
+    device_name = "/dev/sdg"
+    volume_size = 2
+    delete_on_termination = true
+  }
   tags = {
     Name = "web"
   }
@@ -102,6 +111,15 @@ resource "aws_instance" "db" {
   vpc_security_group_ids = ["${aws_security_group.allow_incoming_ssh.id}"]
   key_name = "${aws_key_pair.ansible.key_name}"
   depends_on = ["aws_internet_gateway.gw"]
+  root_block_device {
+    volume_size = 2
+    delete_on_termination = true
+  }
+  ebs_block_device {
+    device_name = "/dev/sdg"
+    volume_size = 2
+    delete_on_termination = true
+  }
   tags = {
     Name = "db"
   }
@@ -115,6 +133,15 @@ resource "aws_instance" "jenkins" {
   vpc_security_group_ids = ["${aws_security_group.allow_incoming_ssh.id}"]
   key_name = "${aws_key_pair.ansible.key_name}"
   depends_on = ["aws_internet_gateway.gw"]
+  root_block_device {
+    volume_size = 2
+    delete_on_termination = true
+  }
+  ebs_block_device {
+    device_name = "/dev/sdg"
+    volume_size = 2
+    delete_on_termination = true
+  }
   tags = {
     Name = "jenkins"
   }

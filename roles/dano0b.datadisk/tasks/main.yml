@@ -1,0 +1,12 @@
+---
+- name: create a ext4 filesystem on /dev/xvdg
+  filesystem:
+    fstype: ext4
+    dev: /dev/xvdg
+
+- name: mount /dev/xvdg to /data
+  mount:
+    path: /data
+    src: /dev/xvdg
+    fstype: ext4
+    state: mounted

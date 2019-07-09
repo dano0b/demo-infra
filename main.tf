@@ -23,6 +23,7 @@ resource "aws_internet_gateway" "gw" {
 resource "aws_subnet" "main" {
   vpc_id     = "${aws_vpc.main.id}"
   cidr_block = "10.0.1.0/24"
+  map_public_ip_on_launch = true
 }
 
 resource "aws_route_table" "route" {
@@ -39,6 +40,20 @@ resource "aws_route_table_association" "route-association" {
   route_table_id = "${aws_route_table.route.id}"
 }
 
+resource "aws_security_group" "allow_outgoing_any" {
+  name        = "allow_outgoing_any"
+  description = "Allow any outgoing traffic"
+  vpc_id      = "${aws_vpc.main.id}"
+}
+
+resource "aws_security_group_rule" "egress-any" {
+  type        = "egress"
+  from_port   = 0
+  to_port     = 0
+  protocol    = "all"
+  cidr_blocks = ["0.0.0.0/0"]
+  security_group_id = "${aws_security_group.allow_outgoing_any.id}"
+}
 
 resource "aws_security_group" "allow_incoming_http" {
   name        = "allow-incoming-demo"
@@ -86,7 +101,7 @@ resource "aws_instance" "web" {
   instance_type = "t2.micro"
   associate_public_ip_address = true
   subnet_id = "${aws_subnet.main.id}"
-  vpc_security_group_ids = ["${aws_security_group.allow_incoming_ssh.id}","${aws_security_group.allow_incoming_http.id}"]
+  vpc_security_group_ids = ["${aws_security_group.allow_outgoing_any.id}","${aws_security_group.allow_incoming_ssh.id}","${aws_security_group.allow_incoming_http.id}"]
   key_name = "${aws_key_pair.ansible.key_name}"
   depends_on = ["aws_internet_gateway.gw"]
   root_block_device {
@@ -108,7 +123,7 @@ resource "aws_instance" "db" {
   instance_type = "t2.micro"
   associate_public_ip_address = true
   subnet_id = "${aws_subnet.main.id}"
-  vpc_security_group_ids = ["${aws_security_group.allow_incoming_ssh.id}"]
+  vpc_security_group_ids = ["${aws_security_group.allow_outgoing_any.id}","${aws_security_group.allow_incoming_ssh.id}"]
   key_name = "${aws_key_pair.ansible.key_name}"
   depends_on = ["aws_internet_gateway.gw"]
   root_block_device {
@@ -130,7 +145,7 @@ resource "aws_instance" "jenkins" {
   instance_type = "t2.micro"
   associate_public_ip_address = true
   subnet_id = "${aws_subnet.main.id}"
-  vpc_security_group_ids = ["${aws_security_group.allow_incoming_ssh.id}"]
+  vpc_security_group_ids = ["${aws_security_group.allow_outgoing_any.id}","${aws_security_group.allow_incoming_ssh.id}","${aws_security_group.allow_incoming_http.id}"]
   key_name = "${aws_key_pair.ansible.key_name}"
   depends_on = ["aws_internet_gateway.gw"]
   root_block_device {

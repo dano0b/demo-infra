@@ -1,4 +1,9 @@
 ---
-- name: do db stuff
-  debug:
-    msg: "do db stuff"
+- name: create a mongodb container
+  docker_container:
+    name: mongodb
+    image: mongo:4.0.10-xenial
+    network_mode: host
+    restart_policy: unless-stopped
+    volumes:
+      - /data/mongodb/data:/data/db

@@ -56,14 +56,22 @@ resource "aws_security_group_rule" "egress-any" {
 }
 
 resource "aws_security_group" "allow_incoming_http" {
-  name        = "allow-incoming-demo"
+  name        = "allow-incoming-http"
   description = "Allow inbound HTTP traffic"
   vpc_id      = "${aws_vpc.main.id}"
 }
-resource "aws_security_group_rule" "ingress-http" {
+resource "aws_security_group_rule" "ingress-http-3000" {
   type        = "ingress"
   from_port   = 3000
   to_port     = 3000
+  protocol    = "tcp"
+  cidr_blocks = ["0.0.0.0/0"]
+  security_group_id = "${aws_security_group.allow_incoming_http.id}"
+}
+resource "aws_security_group_rule" "ingress-http-8080" {
+  type        = "ingress"
+  from_port   = 8080
+  to_port     = 8080
   protocol    = "tcp"
   cidr_blocks = ["0.0.0.0/0"]
   security_group_id = "${aws_security_group.allow_incoming_http.id}"
@@ -152,7 +160,7 @@ resource "aws_instance" "jenkins" {
   instance_type = "t2.micro"
   associate_public_ip_address = true
   subnet_id = "${aws_subnet.main.id}"
-  vpc_security_group_ids = ["${aws_security_group.allow_outgoing_any.id}","${aws_security_group.allow_incoming_ssh.id}"]
+  vpc_security_group_ids = ["${aws_security_group.allow_outgoing_any.id}","${aws_security_group.allow_incoming_ssh.id}","${aws_security_group.allow_incoming_http.id}"]
   key_name = "${aws_key_pair.ansible.key_name}"
   depends_on = ["aws_internet_gateway.gw"]
   root_block_device {

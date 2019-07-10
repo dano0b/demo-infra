@@ -2,7 +2,7 @@
 - name: create the jenkins container
   docker_container:
     name: jenkins
-    image: jenkins/jenkins:lts-alpine
+    image: jenkins/jenkins:lts
     network_mode: host
     restart_policy: unless-stopped
     privileged: true

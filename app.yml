@@ -1,0 +1,6 @@
+---
+- hosts: all
+  become: true
+  roles:
+    - dano0b.mongodb
+    - dano0b.demoapp

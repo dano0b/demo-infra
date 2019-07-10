@@ -2,7 +2,7 @@
 - name: create the demo app container
   docker_container:
     name: demoapp
-    image: dano0b/demo:6
+    image: "dano0b/demo:{{ lookup('env', 'IMAGEVERSION')|default('1') }}"
     network_mode: host
     restart_policy: unless-stopped
     env:

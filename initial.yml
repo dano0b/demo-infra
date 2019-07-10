@@ -1,0 +1,6 @@
+---
+- hosts: all
+  become: true
+  roles:
+    - dano0b.datadisk
+    - dano0b.docker

@@ -76,6 +76,14 @@ resource "aws_security_group_rule" "ingress-http-8080" {
   cidr_blocks = ["0.0.0.0/0"]
   security_group_id = "${aws_security_group.allow_incoming_http.id}"
 }
+resource "aws_security_group_rule" "ingress-http-80" {
+  type        = "ingress"
+  from_port   = 80
+  to_port     = 80
+  protocol    = "tcp"
+  cidr_blocks = ["0.0.0.0/0"]
+  security_group_id = "${aws_security_group.allow_incoming_http.id}"
+}
 
 resource "aws_security_group" "allow_incoming_mongodb" {
   name        = "allow-incoming-mongodb"
@@ -175,4 +183,30 @@ resource "aws_instance" "jenkins" {
   tags = {
     Name = "jenkins"
   }
+}
+
+resource "aws_elb" "demoapp" {
+  name               = "demoapp"
+  subnets = ["${aws_subnet.main.id}"]
+  security_groups = ["${aws_security_group.allow_outgoing_any.id}","${aws_security_group.allow_incoming_http.id}"]
+  listener {
+    instance_port     = 3000
+    instance_protocol = "http"
+    lb_port           = 80
+    lb_protocol       = "http"
+  }
+
+  health_check {
+    healthy_threshold   = 2
+    unhealthy_threshold = 2
+    timeout             = 3
+    target              = "HTTP:3000/"
+    interval            = 30
+  }
+
+  instances                   = ["${aws_instance.web.id}"]
+  cross_zone_load_balancing   = true
+  idle_timeout                = 400
+  connection_draining         = true
+  connection_draining_timeout = 400
 }

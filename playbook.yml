@@ -4,6 +4,10 @@
   roles:
     - dano0b.datadisk
     - dano0b.docker
-    - dano0b.demoapp
+
+- hosts: all
+  become: true
+  roles:
     - dano0b.mongodb
     - dano0b.jenkins
+    - dano0b.demoapp

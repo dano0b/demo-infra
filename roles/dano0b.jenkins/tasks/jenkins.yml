@@ -1,4 +1,11 @@
 ---
-- name: do jenkins stuff
-  debug:
-    msg: "do jenkins stuff"
+- name: create the jenkins container
+  docker_container:
+    name: jenkins
+    image: jenkins/jenkins:lts-alpine
+    network_mode: host
+    restart_policy: unless-stopped
+    privileged: true
+    user: root
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
